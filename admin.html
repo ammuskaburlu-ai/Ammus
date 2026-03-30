@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Ammu's Chai Menu Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Crimson+Pro:wght@300;400;600&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --chai: #8B4513;
+    --chai-light: #C8860A;
+    --cream: #FFF8EE;
+    --parchment: #F5E6C8;
+    --dark: #2C1810;
+    --spice: #A0522D;
+    --milk: #FAF0DC;
+    --steam: #D4A855;
+    --danger: #C0392B;
+    --success: #27AE60;
+    --panel: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1a0f00;
+    color: var(--dark);
+    font-family: 'Crimson Pro', serif;
+    min-height: 100vh;
+  }
+
+  /* SIDEBAR */
+  .layout { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 240px;
+    background: linear-gradient(180deg, #2C1810 0%, #1a0f00 100%);
+    padding: 28px 0;
+    position: fixed;
+    height: 100vh;
+    top: 0; left: 0;
+    z-index: 100;
+    border-right: 1px solid rgba(200,134,10,0.2);
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid rgba(200,134,10,0.2);
+    margin-bottom: 16px;
+  }
+
+  .sidebar-logo .logo-icon { font-size: 2rem; }
+  .sidebar-logo .logo-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--steam);
+    line-height: 1.2;
+    margin-top: 6px;
+  }
+  .sidebar-logo .logo-sub {
+    font-size: 0.75rem;
+    color: rgba(212,168,85,0.5);
+    font-family: 'Caveat', cursive;
+  }
+
+  .nav-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: rgba(212,168,85,0.4);
+    text-transform: uppercase;
+    padding: 12px 20px 6px;
+    font-family: 'Caveat', cursive;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    color: rgba(245,230,200,0.6);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover, .nav-item.active {
+    background: rgba(200,134,10,0.1);
+    color: var(--steam);
+    border-left-color: var(--steam);
+  }
+
+  .nav-item .nav-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+
+  /* MAIN */
+  .main {
+    margin-left: 240px;
+    flex: 1;
+    background: #f5f0e8;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: white;
+    padding: 16px 32px;
+    border-bottom: 1px solid rgba(139,69,19,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+
+  .topbar h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--dark);
+  }
+
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+  .btn {
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--chai), var(--chai-light));
+    color: white;
+    box-shadow: 0 3px 10px rgba(139,69,19,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(139,69,19,0.4); }
+
+  .btn-secondary {
+    background: var(--parchment);
+    color: var(--chai);
+    border: 1.5px solid rgba(139,69,19,0.2);
+  }
+  .btn-secondary:hover { background: var(--cream); }
+
+  .btn-danger {
+    background: rgba(192,57,43,0.1);
+    color: var(--danger);
+    border: 1.5px solid rgba(192,57,43,0.2);
+  }
+  .btn-danger:hover { background: var(--danger); color: white; }
+
+  .btn-small { padding: 5px 12px; font-size: 0.85rem; border-radius: 6px; }
+
+  /* CONTENT */
+  .content { padding: 28px 32px; }
+
+  /* STATS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 14px;
+    padding: 18px 20px;
+    border: 1px solid rgba(139,69,19,0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--spice);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: 'Caveat', cursive;
+  }
+
+  .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--chai);
+    margin-top: 4px;
+  }
+
+  /* PANEL */
+  .panel {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid rgba(139,69,19,0.08);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid rgba(139,69,19,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--dark);
+  }
+
+  /* ADD ITEM FORM */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 12px;
+    padding: 20px 24px;
+    align-items: end;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+  label {
+    font-size: 0.8rem;
+    color: var(--spice);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: 'Caveat', cursive;
+  }
+
+  input, select, textarea {
+    padding: 9px 13px;
+    border: 1.5px solid rgba(139,69,19,0.2);
+    border-radius: 8px;
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.95rem;
+    color: var(--dark);
+    background: var(--cream);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--chai-light);
+    background: white;
+  }
+
+  /* MENU ITEMS TABLE */
+  .items-filter {
+    padding: 14px 24px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid rgba(139,69,19,0.06);
+    background: var(--cream);
+  }
+
+  .filter-chip {
+    padding: 5px 14px;
+    border-radius: 50px;
+    border: 1.5px solid rgba(139,69,19,0.15);
+    background: white;
+    color: var(--spice);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Crimson Pro', serif;
+  }
+
+  .filter-chip:hover, .filter-chip.active {
+    background: var(--chai);
+    border-color: var(--chai);
+    color: white;
+  }
+
+  .items-list { padding: 0; }
+
+  .item-row {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1fr 1fr auto;
+    align-items: center;
+    padding: 13px 24px;
+    border-bottom: 1px solid rgba(139,69,19,0.05);
+    gap: 12px;
+    transition: background 0.15s;
+  }
+
+  .item-row:hover { background: var(--cream); }
+  .item-row.header {
+    background: var(--parchment);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--spice);
+    font-family: 'Caveat', cursive;
+    font-weight: 600;
+    border-bottom: 2px solid rgba(139,69,19,0.1);
+  }
+
+  .item-name-cell { font-weight: 600; color: var(--dark); }
+  .item-cat-cell { color: var(--spice); font-size: 0.9rem; }
+
+  .price-input-inline {
+    width: 80px;
+    padding: 5px 8px;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .status-badge {
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: 'Caveat', cursive;
+  }
+
+  .status-active { background: rgba(39,174,96,0.12); color: var(--success); }
+  .status-coming { background: rgba(200,134,10,0.12); color: var(--chai-light); }
+
+  .row-actions { display: flex; gap: 6px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--dark);
+    color: var(--parchment);
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-family: 'Crimson Pro', serif;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+    border-left: 4px solid var(--steam);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: 18px;
+    padding: 28px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .modal h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--dark);
+    margin-bottom: 20px;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: flex-end;
+  }
+
+  .search-box {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1.5px solid rgba(139,69,19,0.2);
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.95rem;
+    background: var(--cream);
+    outline: none;
+    width: 200px;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .form-grid { grid-template-columns: 1fr 1fr; }
+    .item-row { grid-template-columns: 1fr auto; }
+    .item-cat-cell, .status-badge, .item-row.header .price-col, .item-row.header .status-col { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">☕</div>
+      <div class="logo-name">Ammu's Chai<br>with Maska Bun</div>
+      <div class="logo-sub">Admin Panel</div>
+    </div>
+    <div class="nav-label">Menu</div>
+    <div class="nav-item active" onclick="showSection('items')">
+      <span class="nav-icon">🍽️</span> Menu Items
+    </div>
+    <div class="nav-item" onclick="showSection('categories')">
+      <span class="nav-icon">📂</span> Categories
+    </div>
+    <div class="nav-label">Actions</div>
+    <div class="nav-item" onclick="exportMenu()">
+      <span class="nav-icon">📤</span> Export Menu
+    </div>
+    <div class="nav-item" onclick="window.open('index.html','_blank')">
+      <span class="nav-icon">👁️</span> View Live Page
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <h1>Menu Manager</h1>
+      <div class="topbar-actions">
+        <input type="text" class="search-box" placeholder="🔍 Search items..." oninput="filterSearch(this.value)">
+        <button class="btn btn-primary" onclick="openAddModal()">+ Add Item</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total Items</div>
+          <div class="stat-value" id="stat-total">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active</div>
+          <div class="stat-value" id="stat-active" style="color:#27AE60">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Coming Soon</div>
+          <div class="stat-value" id="stat-coming" style="color:#C8860A">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Categories</div>
+          <div class="stat-value" id="stat-cats">0</div>
+        </div>
+      </div>
+
+      <!-- MENU ITEMS PANEL -->
+      <div class="panel" id="section-items">
+        <div class="panel-header">
+          <div class="panel-title">All Menu Items</div>
+          <button class="btn btn-secondary btn-small" onclick="saveAll()">💾 Save Changes</button>
+        </div>
+        <div class="items-filter" id="cat-filter">
+          <button class="filter-chip active" onclick="filterCat('all', this)">All</button>
+        </div>
+        <div class="item-row header">
+          <div>Item Name</div>
+          <div>Category</div>
+          <div class="price-col">Price (₹)</div>
+          <div class="status-col">Status</div>
+          <div>Actions</div>
+        </div>
+        <div class="items-list" id="items-list"></div>
+      </div>
+
+      <!-- CATEGORIES PANEL -->
+      <div class="panel" id="section-categories" style="display:none">
+        <div class="panel-header">
+          <div class="panel-title">Manage Categories</div>
+        </div>
+        <div style="padding:20px 24px">
+          <div style="display:flex;gap:12px;margin-bottom:20px;">
+            <input type="text" id="new-cat-name" placeholder="Category name (e.g. Chai)" style="flex:1">
+            <input type="text" id="new-cat-icon" placeholder="Emoji icon (e.g. ☕)" style="width:100px">
+            <button class="btn btn-primary" onclick="addCategory()">+ Add</button>
+          </div>
+          <div id="cat-list-manage"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Add New Item</h3>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:14px;padding:0">
+      <div class="form-group">
+        <label>Item Name</label>
+        <input type="text" id="f-name" placeholder="e.g. Cutting Chai">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="f-cat"></select>
+      </div>
+      <div class="form-group">
+        <label>Sub-category (optional)</label>
+        <input type="text" id="f-subcat" placeholder="e.g. Veg / Non-Veg">
+      </div>
+      <div class="form-group">
+        <label>Price (₹) — leave blank if coming soon</label>
+        <input type="number" id="f-price" placeholder="e.g. 60">
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Note (optional)</label>
+        <input type="text" id="f-note" placeholder="e.g. Extra cheese ₹10">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveItem()">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ─────────────────────────────────────────────────────────
+const DEFAULT_CATEGORIES = [
+  { id: 'pasta', name: 'Pasta', icon: '🍝' },
+  { id: 'spaghetti', name: 'Spaghetti', icon: '🍜' },
+  { id: 'ramen', name: 'Ramen Noodles', icon: '🥢' },
+  { id: 'maggi', name: 'Maggi Ramen', icon: '🍜' },
+  { id: 'hotdog', name: 'Hotdog', icon: '🌭' },
+  { id: 'fries', name: 'French Fries', icon: '🍟' },
+  { id: 'momos', name: 'Momos', icon: '🥟' },
+  { id: 'pancakes', name: 'Thai Pancakes', icon: '🥞' },
+  { id: 'more', name: 'Specials & More', icon: '⭐' },
+];
+
+const DEFAULT_ITEMS = [
+  { id:1, name:'White Sauce Pasta', cat:'pasta', subcat:'', price:60, note:'' },
+  { id:2, name:'Cheesy Red Sauce Pasta', cat:'pasta', subcat:'', price:70, note:'' },
+  { id:3, name:'Pink Sauce Pasta', cat:'pasta', subcat:'', price:70, note:'' },
+  { id:4, name:'Pesto Pasta', cat:'pasta', subcat:'', price:90, note:'' },
+  { id:5, name:'Masala Tomato Pasta', cat:'pasta', subcat:'', price:70, note:'' },
+  { id:6, name:'Red Sauce Spaghetti', cat:'spaghetti', subcat:'', price:160, note:'' },
+  { id:7, name:'White Sauce Spaghetti', cat:'spaghetti', subcat:'', price:130, note:'' },
+  { id:8, name:'Pink Sauce Spaghetti', cat:'spaghetti', subcat:'', price:160, note:'' },
+  { id:9, name:'Pesto Spaghetti', cat:'spaghetti', subcat:'', price:170, note:'' },
+  { id:10, name:'Paneer Ramen', cat:'ramen', subcat:'Veg', price:150, note:'Chopsticks ₹10 extra' },
+  { id:11, name:'Soya Ramen', cat:'ramen', subcat:'Veg', price:139, note:'Chopsticks ₹10 extra' },
+  { id:12, name:'Egg Ramen', cat:'ramen', subcat:'Non-Veg', price:130, note:'Chopsticks ₹10 extra' },
+  { id:13, name:'Chicken Ramen', cat:'ramen', subcat:'Non-Veg', price:170, note:'Chopsticks ₹10 extra' },
+  { id:14, name:'Paneer Maggi Ramen', cat:'maggi', subcat:'', price:100, note:'Chopsticks ₹10 extra' },
+  { id:15, name:'Egg Maggi Ramen', cat:'maggi', subcat:'', price:70, note:'Chopsticks ₹10 extra' },
+  { id:16, name:'Chicken Maggi Ramen', cat:'maggi', subcat:'', price:130, note:'Chopsticks ₹10 extra' },
+  { id:17, name:'Veg Masala Maggi', cat:'maggi', subcat:'', price:50, note:'Extra cheese ₹10' },
+  { id:18, name:'Paneer Masala Maggi', cat:'maggi', subcat:'', price:70, note:'Extra cheese ₹10' },
+  { id:19, name:'Egg Masala Maggi', cat:'maggi', subcat:'', price:60, note:'Extra cheese ₹10' },
+  { id:20, name:'Chicken Masala Maggi', cat:'maggi', subcat:'', price:90, note:'Extra cheese ₹10' },
+  { id:21, name:'Soya Hotdog', cat:'hotdog', subcat:'Veg', price:60, note:'' },
+  { id:22, name:'Paneer Hotdog', cat:'hotdog', subcat:'Veg', price:90, note:'' },
+  { id:23, name:'Egg Hotdog', cat:'hotdog', subcat:'Non-Veg', price:70, note:'' },
+  { id:24, name:'Chicken Hotdog', cat:'hotdog', subcat:'Non-Veg', price:130, note:'' },
+  { id:25, name:'Sauce Loaded Fries', cat:'fries', subcat:'', price:100, note:'' },
+  { id:26, name:'Cheese Blast Fries', cat:'fries', subcat:'', price:130, note:'' },
+  { id:27, name:'Paneer Cheese Blast Fries', cat:'fries', subcat:'', price:150, note:'' },
+  { id:28, name:'Peri Peri Fries', cat:'fries', subcat:'', price:70, note:'' },
+  { id:29, name:'Steamed Momos', cat:'momos', subcat:'', price:60, note:'' },
+  { id:30, name:'Fried Momos', cat:'momos', subcat:'', price:70, note:'' },
+  { id:31, name:'Egg Banana Pancake', cat:'pancakes', subcat:'', price:100, note:'' },
+  { id:32, name:'Nutella Banana Pancake', cat:'pancakes', subcat:'', price:130, note:'' },
+  { id:33, name:'Vada Pav', cat:'more', subcat:'', price:50, note:'Mumbai style, Nellore soul' },
+  { id:34, name:'Bread Omelette', cat:'more', subcat:'Omelette', price:null, note:'' },
+  { id:35, name:'Spl Cheese Omelette', cat:'more', subcat:'Omelette', price:null, note:'' },
+  { id:36, name:'Masala Omelette', cat:'more', subcat:'Omelette', price:null, note:'' },
+  { id:37, name:'Paneer Sandwich', cat:'more', subcat:'Sandwich', price:null, note:'' },
+  { id:38, name:'Egg Sandwich', cat:'more', subcat:'Sandwich', price:null, note:'' },
+  { id:39, name:'Chicken Sandwich', cat:'more', subcat:'Sandwich', price:null, note:'' },
+  { id:40, name:'Avocado Sandwich (Spl)', cat:'more', subcat:'Sandwich', price:null, note:'' },
+];
+
+let categories = JSON.parse(localStorage.getItem('ammu_cats') || 'null') || DEFAULT_CATEGORIES;
+let items = JSON.parse(localStorage.getItem('ammu_items') || 'null') || DEFAULT_ITEMS;
+let nextId = Math.max(...items.map(i => i.id)) + 1;
+let editingId = null;
+let currentCatFilter = 'all';
+let searchQuery = '';
+
+// ─── INIT ─────────────────────────────────────────────────────────
+function init() {
+  renderCatFilter();
+  renderItems();
+  updateStats();
+  populateCatSelect();
+  renderCatManage();
+}
+
+// ─── STATS ────────────────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('stat-total').textContent = items.length;
+  document.getElementById('stat-active').textContent = items.filter(i => i.price !== null).length;
+  document.getElementById('stat-coming').textContent = items.filter(i => i.price === null).length;
+  document.getElementById('stat-cats').textContent = categories.length;
+}
+
+// ─── CATEGORIES ───────────────────────────────────────────────────
+function renderCatFilter() {
+  const container = document.getElementById('cat-filter');
+  container.innerHTML = '<button class="filter-chip active" onclick="filterCat(\'all\', this)">All</button>';
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-chip';
+    btn.textContent = `${cat.icon} ${cat.name}`;
+    btn.onclick = function() { filterCat(cat.id, this); };
+    container.appendChild(btn);
+  });
+}
+
+function filterCat(cat, btn) {
+  currentCatFilter = cat;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderItems();
+}
+
+function filterSearch(q) {
+  searchQuery = q.toLowerCase();
+  renderItems();
+}
+
+function populateCatSelect() {
+  const sel = document.getElementById('f-cat');
+  sel.innerHTML = categories.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('');
+}
+
+function renderCatManage() {
+  const container = document.getElementById('cat-list-manage');
+  container.innerHTML = categories.map(cat => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(139,69,19,0.08)">
+      <span style="font-size:1.4rem">${cat.icon}</span>
+      <span style="flex:1;font-family:'Playfair Display',serif;font-size:1rem">${cat.name}</span>
+      <span style="font-size:0.85rem;color:var(--spice)">${items.filter(i=>i.cat===cat.id).length} items</span>
+      <button class="btn btn-danger btn-small" onclick="deleteCategory('${cat.id}')">Remove</button>
+    </div>
+  `).join('');
+}
+
+function addCategory() {
+  const name = document.getElementById('new-cat-name').value.trim();
+  const icon = document.getElementById('new-cat-icon').value.trim() || '🍽️';
+  if (!name) return toast('Enter a category name');
+  const id = name.toLowerCase().replace(/\s+/g, '_');
+  if (categories.find(c => c.id === id)) return toast('Category already exists');
+  categories.push({ id, name, icon });
+  save();
+  renderCatFilter();
+  populateCatSelect();
+  renderCatManage();
+  updateStats();
+  document.getElementById('new-cat-name').value = '';
+  document.getElementById('new-cat-icon').value = '';
+  toast('✅ Category added!');
+}
+
+function deleteCategory(id) {
+  if (items.find(i => i.cat === id)) return toast('⚠️ Remove all items in this category first');
+  if (!confirm('Delete this category?')) return;
+  categories = categories.filter(c => c.id !== id);
+  save();
+  renderCatFilter();
+  populateCatSelect();
+  renderCatManage();
+  updateStats();
+  toast('🗑️ Category removed');
+}
+
+// ─── ITEMS ────────────────────────────────────────────────────────
+function renderItems() {
+  const list = document.getElementById('items-list');
+  let filtered = items;
+  if (currentCatFilter !== 'all') filtered = filtered.filter(i => i.cat === currentCatFilter);
+  if (searchQuery) filtered = filtered.filter(i => i.name.toLowerCase().includes(searchQuery));
+
+  if (!filtered.length) {
+    list.innerHTML = '<div style="padding:32px;text-align:center;color:var(--spice);font-style:italic">No items found</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(item => {
+    const cat = categories.find(c => c.id === item.cat);
+    const hasPrice = item.price !== null && item.price !== undefined;
+    return `
+      <div class="item-row" id="row-${item.id}">
+        <div class="item-name-cell">
+          ${item.name}
+          ${item.note ? `<div style="font-size:0.78rem;color:var(--spice);font-style:italic">${item.note}</div>` : ''}
+        </div>
+        <div class="item-cat-cell">${cat ? cat.icon + ' ' + cat.name : item.cat}${item.subcat ? ' · ' + item.subcat : ''}</div>
+        <div>
+          <input type="number" class="price-input-inline" 
+            value="${hasPrice ? item.price : ''}" 
+            placeholder="—"
+            onchange="updatePrice(${item.id}, this.value)"
+            style="width:80px">
+        </div>
+        <div>
+          <span class="status-badge ${hasPrice ? 'status-active' : 'status-coming'}">
+            ${hasPrice ? '✓ Active' : '⏳ Soon'}
+          </span>
+        </div>
+        <div class="row-actions">
+          <button class="btn btn-secondary btn-small" onclick="openEditModal(${item.id})">Edit</button>
+          <button class="btn btn-danger btn-small" onclick="deleteItem(${item.id})">✕</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updatePrice(id, val) {
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  item.price = val === '' ? null : parseInt(val);
+  save();
+  updateStats();
+  toast('💾 Price updated — click Save Changes to apply');
+}
+
+function deleteItem(id) {
+  const item = items.find(i => i.id === id);
+  if (!confirm(`Remove "${item.name}" from the menu?`)) return;
+  items = items.filter(i => i.id !== id);
+  save();
+  renderItems();
+  updateStats();
+  toast('🗑️ Item removed');
+}
+
+// ─── MODAL ────────────────────────────────────────────────────────
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modal-title').textContent = '+ Add New Item';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-price').value = '';
+  document.getElementById('f-note').value = '';
+  document.getElementById('f-subcat').value = '';
+  document.getElementById('modal').classList.add('show');
+}
+
+function openEditModal(id) {
+  const item = items.find(i => i.id === id);
+  editingId = id;
+  document.getElementById('modal-title').textContent = 'Edit Item';
+  document.getElementById('f-name').value = item.name;
+  document.getElementById('f-cat').value = item.cat;
+  document.getElementById('f-price').value = item.price ?? '';
+  document.getElementById('f-note').value = item.note;
+  document.getElementById('f-subcat').value = item.subcat || '';
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+
+function saveItem() {
+  const name = document.getElementById('f-name').value.trim();
+  const cat = document.getElementById('f-cat').value;
+  const price = document.getElementById('f-price').value;
+  const note = document.getElementById('f-note').value.trim();
+  const subcat = document.getElementById('f-subcat').value.trim();
+
+  if (!name) return toast('⚠️ Item name is required');
+  if (!cat) return toast('⚠️ Please select a category');
+
+  if (editingId) {
+    const item = items.find(i => i.id === editingId);
+    item.name = name;
+    item.cat = cat;
+    item.price = price === '' ? null : parseInt(price);
+    item.note = note;
+    item.subcat = subcat;
+    toast('✅ Item updated!');
+  } else {
+    items.push({ id: nextId++, name, cat, subcat, price: price === '' ? null : parseInt(price), note });
+    toast('✅ Item added!');
+  }
+
+  save();
+  renderItems();
+  updateStats();
+  closeModal();
+}
+
+// ─── SECTIONS ─────────────────────────────────────────────────────
+function showSection(sec) {
+  document.getElementById('section-items').style.display = sec === 'items' ? 'block' : 'none';
+  document.getElementById('section-categories').style.display = sec === 'categories' ? 'block' : 'none';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.target.closest('.nav-item').classList.add('active');
+  if (sec === 'categories') renderCatManage();
+}
+
+// ─── SAVE / EXPORT ────────────────────────────────────────────────
+function save() {
+  localStorage.setItem('ammu_items', JSON.stringify(items));
+  localStorage.setItem('ammu_cats', JSON.stringify(categories));
+}
+
+function saveAll() {
+  save();
+  toast('✅ All changes saved!');
+}
+
+function exportMenu() {
+  const data = { categories, items };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ammus_menu.json';
+  a.click();
+  toast('📤 Menu exported as JSON!');
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─── KEYBOARD ─────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveAll(); }
+});
+
+init();
+</script>
+</body>
+</html>

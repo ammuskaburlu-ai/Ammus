@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu Poster — Ammu's Chai</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Caveat:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #ccc;
+    font-family: 'Crimson Pro', serif;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .print-note {
+    background: #333;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    max-width: 780px;
+    width: 100%;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .print-note strong { color: #f0c040; }
+
+  @media print {
+    body { background: white; padding: 0; gap: 0; }
+    .print-note { display: none; }
+    .poster { box-shadow: none !important; page-break-after: always; }
+    .poster:last-child { page-break-after: avoid; }
+  }
+
+  /* POSTER — A4 (210mm × 297mm) ≈ 794px × 1123px at 96dpi */
+  .poster {
+    width: 780px;
+    background: white;
+    border: 2.5px solid black;
+    padding: 30px 34px 26px;
+    position: relative;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.2);
+    color: black;
+  }
+
+  /* Double border */
+  .poster::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 1px solid black;
+    pointer-events: none;
+  }
+
+  /* Corner ornaments */
+  .corner {
+    position: absolute;
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .corner.tl { top: 16px; left: 16px; }
+  .corner.tr { top: 16px; right: 16px; }
+  .corner.bl { bottom: 16px; left: 16px; }
+  .corner.br { bottom: 16px; right: 16px; }
+
+  /* HEADER */
+  .poster-header {
+    text-align: center;
+    padding: 0 30px 18px;
+    border-bottom: 2.5px solid black;
+    margin-bottom: 18px;
+  }
+
+  .poster-eyebrow {
+    font-family: 'Caveat', cursive;
+    font-size: 0.85rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: black;
+    opacity: 0.5;
+    margin-bottom: 4px;
+  }
+
+  .poster-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 900;
+    line-height: 1.0;
+    color: black;
+  }
+
+  .poster-title em {
+    font-style: italic;
+    font-weight: 700;
+  }
+
+  .poster-sub {
+    font-family: 'Caveat', cursive;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    color: black;
+    opacity: 0.55;
+    margin-top: 6px;
+  }
+
+  .ornament {
+    text-align: center;
+    font-size: 0.8rem;
+    letter-spacing: 0.4em;
+    margin: 8px 0;
+    color: black;
+    opacity: 0.4;
+  }
+
+  /* MENU LAYOUT — 2 columns */
+  .menu-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 28px;
+  }
+
+  /* CATEGORY */
+  .cat-block {
+    margin-bottom: 16px;
+    break-inside: avoid;
+  }
+
+  .cat-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: black;
+    border-bottom: 1.5px solid black;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .cat-title .emoji {
+    font-size: 1rem;
+  }
+
+  .sub-label {
+    font-family: 'Caveat', cursive;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: black;
+    opacity: 0.45;
+    margin: 6px 0 3px;
+    padding-left: 2px;
+  }
+
+  .item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 6px;
+    padding: 2.5px 0;
+    border-bottom: 0.5px dotted rgba(0,0,0,0.2);
+  }
+
+  .item-row:last-child { border-bottom: none; }
+
+  .item-name {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: black;
+    flex: 1;
+    line-height: 1.3;
+  }
+
+  .item-dots {
+    flex: 1;
+    border-bottom: 1px dotted rgba(0,0,0,0.3);
+    margin: 0 5px;
+    min-width: 20px;
+    position: relative;
+    top: -3px;
+  }
+
+  .item-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: black;
+    white-space: nowrap;
+  }
+
+  .price-soon {
+    font-family: 'Caveat', cursive;
+    font-size: 0.75rem;
+    opacity: 0.4;
+    font-style: italic;
+  }
+
+  .note-line {
+    font-family: 'Caveat', cursive;
+    font-size: 0.72rem;
+    opacity: 0.45;
+    padding: 1px 0 5px;
+    font-style: italic;
+    letter-spacing: 0.02em;
+  }
+
+  /* COLUMN DIVIDER */
+  .col-divider {
+    grid-column: 1;
+    width: calc(100% + 28px + 100%/2);
+    height: 0;
+    border: none;
+  }
+
+  /* FOOTER */
+  .poster-footer {
+    margin-top: 18px;
+    border-top: 2px solid black;
+    padding-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .footer-left {
+    font-family: 'Caveat', cursive;
+    font-size: 0.8rem;
+    color: black;
+    opacity: 0.5;
+    line-height: 1.6;
+  }
+
+  .footer-center {
+    text-align: center;
+  }
+
+  .footer-center .big-emoji {
+    font-size: 1.8rem;
+    display: block;
+  }
+
+  .footer-center .tagline {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.8rem;
+    color: black;
+    opacity: 0.55;
+  }
+
+  .footer-right {
+    text-align: right;
+    font-family: 'Caveat', cursive;
+    font-size: 0.8rem;
+    color: black;
+    opacity: 0.5;
+    line-height: 1.6;
+  }
+
+  /* CHOPSTICK NOTE INLINE */
+  .global-note {
+    background: rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-family: 'Caveat', cursive;
+    font-size: 0.72rem;
+    color: black;
+    opacity: 0.6;
+    margin-bottom: 8px;
+    display: block;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="print-note">
+  📋 <strong>Print settings:</strong> Ctrl+P → Paper: <strong>A4</strong> → Margins: <strong>None / Minimum</strong> → Scale: <strong>Fit to page</strong> → Black & White ✓ → Works perfectly on any xerox machine!
+</div>
+
+<div class="poster">
+  <div class="corner tl">✦</div>
+  <div class="corner tr">✦</div>
+  <div class="corner bl">✦</div>
+  <div class="corner br">✦</div>
+
+  <!-- HEADER -->
+  <div class="poster-header">
+    <div class="poster-eyebrow">— Est. Nellore —</div>
+    <div class="poster-title">Ammu's <em>Chai</em><br>with Maska Bun</div>
+    <div class="poster-sub">Magunta Layout · Mini Bypass Road · Nellore</div>
+    <div class="ornament">· · · ✦ · · ·</div>
+    <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:1rem;opacity:0.55">Our Menu</div>
+  </div>
+
+  <!-- MENU -->
+  <div class="menu-columns">
+
+    <!-- LEFT COLUMN -->
+    <div>
+
+      <!-- PASTA -->
+      <div class="cat-block">
+        <div class="cat-title"><span class="emoji">🍝</span> Pasta</div>
+        <div class="item-row"><span class="item-name">White Sauce Pasta</span><span class="item-dots"></span><span class="item-price">₹60</span></div>
+        <div class="item-row"><span class="item-name">Cheesy Red Sauce Pasta</span><span class="item-dots"></span><span class="item-price">₹70</span></div>
+        <div class="item-row"><span class="item-name">Pink Sauce Pasta</span><span class="item-dots"></span><span class="item-price">₹70</span></div>
+        <div class="item-row"><span class="item-name">Pesto Pasta</span><span class="item-dots"></span><span class="item-price">₹90</span></div>
+        <div class="item-row"><span class="item-name">Masala Tomato Pasta</span><span class="item-dots"></span><span class="item-price">₹70</span></div>
+      </div>
+
+      <!-- SPAGHETTI -->
+      <div class="cat-block">
+        <div class="cat-title"><span class="emoji">🍜</span> Spaghetti</div>
+        <div class="item-row"><span class="item-name">Red Sauce</span><span class="item-dots"></span><span class="item-price">₹160</span></div>
+        <div class="item-row"><span class="item-name">White Sauce</span><span class="item-dots"></span><span class="item-price">₹130</span></div>
+        <div class="item-row"><span class="item-name">Pink Sauce</span><span class="item-dots"></span><span class="item-price">₹160</span></div>
+        <div class="item-row"><span class="item-name">Pesto</span><span class="item-dots"></span><span class="item-price">₹170</span></div>
+      </div>
+
+      <!-- RAMEN -->
+      <div class="cat-block">
+        <div class="cat-title"><span class="emoji">🥢</span> Ramen Noodles</div>
+        <span class="global-note">🥢 Chopsticks · ₹10 extra</span>
+        <div class="sub-label">Veg</div>
+        <div class="item-row"><span class="item-name">Paneer Ramen</span><span class="item-dots"></span><span class="item-price">₹150</span></div>
+        <div class="item-row"><span class="item-name">Soya Ramen</span><span class="item-dots"></span><span class="item-price">₹139</span></div>
+        <div class="sub-label">Non-Veg</div>
+        <div class="item-row"><span class="item-name">Egg Ramen</span><span class="item-dots"></span><span class="item-price">₹130</span></div>
+        <div class="item-row"><span class="item-name">Chicken Ramen</span><span class="item-dots"></span><span class="item-price">₹170</span></div>
+      </div>
+
+      <!-- HOTDOG -->
+      <div class="cat-block">
+        <div class="cat-title"><span class="emoji">🌭</span> Hotdog</div>
+        <div class="sub-label">Veg</div>
+        <div class="item-row"><span class="item-name">Soya Hotdog</span><span class="item-dots"></span><span class="item-price">₹60</span></div>
+        <div class="item-row"><span class="item-name">Paneer Hotdog</span><span class="item-dots"></span><span class="item-price">₹90</span></div>
+        <div class="sub-label">Non-Veg</div>
+        <div class="item-row"><span class="item-name">Egg Hotdog</span><span class="item-dots"></span><span class="item-price">₹70</span></div>
+        <div class="item-row"><span class="item-name">Chicken Hotdog</span><span class="item-dots"></span><span class="item-price">₹130</span></div>
+      </div>
+
+    </div><!-- end left column -->
+
+    <!-- RIGHT COLUMN -->
+    <div>
+
+      <!-- MAGGI RAMEN -->
+      <div class="cat-block">
+        <div class="cat-title"><span class="emoji">🍜</span> Maggi Ramen</div>
+        <span class="global-note">🥢 Chopsticks ₹10 · 🧀 Cheese ₹10</span>
+        <div class="item-row"><span class="item-name">Paneer Maggi Ramen</span><span class="item-dots"></span><span class="item-price">₹100</span></div>
+        <div class="item-row"><span class="item-name">Egg Maggi Ramen</span><span class="item-dots"></span><span class="item-price">₹70</span></div>
+        <div class="item-row"><span class="item-name">Chicken Maggi Ramen</span><span class="item-dots"></span><span class="item-price">₹130</span></div>
+      </div>
+
+      <!-- MASALA MAGGI -->
+      <div class="cat-block">
+        <div class="cat-title"><span class="emoji">🍜</span> Masala Maggi</div>
+        <span class="global-note">🧀 Extra cheese · ₹10</span>
+        <div class="item-row"><span class="item-name">Veg Masala</span><span class="item-dots"></span><span class="item-price">₹50</span></div>
+        <div class="item-row"><span class="item-name">Paneer Masala</span><span class="item-dots"></span><span class="item-price">₹70</span></div>
+        <div class="item-row"><span class="item-name">Egg Masala</span><span class="item-dots"></span><span class="item-price">₹60</span></div>
+        <div class="item-row"><span class="item-name">Chicken Masala</span><span class="item-dots"></span><span class="item-price">₹90</span></div>
+      </div>
+
+      <!-- FRENCH FRIES -->
+      <div class="cat-block">
+        <div class="cat-title"><span class="emoji">🍟</span> French Fries</div>
+        <div class="item-row"><span class="item-name">Sauce Loaded</span><span class="item-dots"></span><span class="item-price">₹100</span></div>
+        <div class="item-row"><span class="item-name">Cheese Blast</span><span class="item-dots"></span><span class="item-price">₹130</span></div>
+        <div class="item-row"><span class="item-name">Paneer Cheese Blast</span><span class="item-dots"></span><span class="item-price">₹150</span></div>
+        <div class="item-row"><span class="item-name">Peri Peri</span><span class="item-dots"></span><span class="item-price">₹70</span></div>
+      </div>
+
+      <!-- MOMOS -->
+      <div class="cat-block">
+        <div class="cat-title"><span class="emoji">🥟</span> Momos</div>
+        <div class="item-row"><span class="item-name">Steamed Momos</span><span class="item-dots"></span><span class="item-price">₹60</span></div>
+        <div class="item-row"><span class="item-name">Fried Momos</span><span class="item-dots"></span><span class="item-price">₹70</span></div>
+      </div>
+
+      <!-- THAI PANCAKES -->
+      <div class="cat-block">
+        <div class="cat-title"><span class="emoji">🥞</span> Thai Pancakes</div>
+        <div class="item-row"><span class="item-name">Egg Banana</span><span class="item-dots"></span><span class="item-price">₹100</span></div>
+        <div class="item-row"><span class="item-name">Nutella Banana</span><span class="item-dots"></span><span class="item-price">₹130</span></div>
+      </div>
+
+      <!-- SPECIALS -->
+      <div class="cat-block">
+        <div class="cat-title"><span class="emoji">⭐</span> Specials</div>
+        <div class="item-row"><span class="item-name">Vada Pav</span><span class="item-dots"></span><span class="item-price">₹50</span></div>
+        <div class="item-row"><span class="item-name">Bread / Masala / Cheese Omelette</span><span class="item-dots"></span><span class="item-price price-soon">Ask us</span></div>
+        <div class="item-row"><span class="item-name">Sandwiches (Paneer / Egg / Chicken)</span><span class="item-dots"></span><span class="item-price price-soon">Ask us</span></div>
+        <div class="item-row"><span class="item-name">Avocado Sandwich (Spl)</span><span class="item-dots"></span><span class="item-price price-soon">Ask us</span></div>
+      </div>
+
+    </div><!-- end right column -->
+  </div><!-- end menu columns -->
+
+  <!-- FOOTER -->
+  <div class="poster-footer">
+    <div class="footer-left">
+      📍 Mini Bypass Road<br>
+      near 1947 Restaurant<br>
+      Magunta Layout, Nellore
+    </div>
+    <div class="footer-center">
+      <span class="big-emoji">☕</span>
+      <div class="tagline">"Come for the chai.<br>Stay for the vibe."</div>
+    </div>
+    <div class="footer-right">
+      Scan the QR poster<br>for the full digital<br>menu experience →
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
